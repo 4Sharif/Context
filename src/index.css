@@ -1,0 +1,227 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+}
+
+.settings-tab {
+  background-color: #2c2c2c;
+  padding: 10px;
+  width: 35px;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.settings-tab.open {
+  width: 200px;
+}
+
+.toggle-settings {
+  background: none;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.settings-content {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+
+.settings-content ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.settings-content li {
+  margin: 10px 0;
+}
+
+.main-dashboard {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 36px;
+  margin: 0; 
+}
+
+.user-info {
+  text-align: right;
+}
+
+.new-doc-button {
+  margin: 20px 0;
+  padding: 15px 0;
+  width: 100%;
+  border: none;
+  border-radius: 30px;
+  background-color: #2c2c2c;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.saved-documents ul {
+  list-style: none;
+  padding: 0;
+}
+
+.saved-documents li {
+  margin: 12px 0;
+  padding: 12px 16px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+}
+
+
+.doc-link {
+  margin-right: 10px;
+  padding: 8px 12px;
+  font-size: 20px; 
+  background-color: transparent;
+  color: white;
+  border: none;
+  text-align: left;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.delete-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #555;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #777;
+}
+
+.logout-button {
+  margin-top: auto;
+  padding: 10px;
+  background-color: #2c2c2c;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.aboutus-button {
+  margin-top: 8px;
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.aboutus-button:hover {
+  background-color: #777;
+}
+
+.about-page {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+}
+
+.about-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.about-subtitle {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.about-description {
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+.team-members {
+  margin-top: 5px;
+}
+
+.team-members h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.team-members ul {
+  list-style-type: disc;
+  margin-left: 20px;
+}
+
+.back-button {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  background-color: #777;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #999;
+}
+
+.doc-scroll-container {
+  max-height: 505px; 
+  overflow-y: auto;
+  padding-right: 5px;
+}
+ 
+.doc-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.doc-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #999;
+  border-radius: 3px;
+}
+
+.download-button {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 10px 20px;
+  background-color: #777;
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.download-button:hover {
+  background-color: #999;
+}
