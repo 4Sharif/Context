@@ -15,6 +15,7 @@
   display: flex;
   height: calc(100vh - 50px); /* subtract height of settings bar */
   width: 100%;
+  margin: 7.5px 0px; 
 }
 
 /* Editor fills remaining space */

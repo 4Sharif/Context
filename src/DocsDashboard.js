@@ -26,7 +26,7 @@ function DocsDashboard() {
 
   // Handles user authentication and fetches docs when user logs in
   useEffect(() => {
-    document.title = "CCE Dashboard";
+    document.title = "Dashboard";
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         navigate("/"); // Redirect to login if not logged in
@@ -107,8 +107,7 @@ function DocsDashboard() {
     await signOut(auth);
     navigate("/");
   };
-
-  // JSX layout for dashboard page
+ 
   return (
     <div className="dashboard-container">
       <div className={`settings-tab ${showSettings ? "open" : ""}`}>
@@ -124,7 +123,7 @@ function DocsDashboard() {
 
       <div className="main-dashboard">
         <div className="dashboard-header">
-          <h1 className="logo">CCE Dashboard</h1>
+          <h1 className="logo">Dashboard</h1>
           <div className="user-info">
             <p>Welcome</p>
             <strong>{user?.displayName || "User"}</strong>

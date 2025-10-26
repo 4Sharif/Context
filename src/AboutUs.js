@@ -12,12 +12,12 @@ function AboutUs() {
 
   return (
     <div className="about-page">
-      <h1 className="about-title">About Us – Collaborative Code Editor ©</h1>  
+      <h1 className="about-title">Context – Create, Compile, Collab</h1>  
       <div className="team-members">
         <h3>Group Members: Mohamed Sharif, Vincent Nguyen, Justice Gauldin, and Asrar Syed</h3> 
       </div>
       <p className="about-description">
-        Collaborative Code Editor is a full-stack, cloud-based web application designed to help users 
+        Context is a full-stack, cloud-based web application designed to help users 
         write, compile, and collaborate on code in real-time. Built with React and Firebase, CCE 
         enables multiple users to work together on shared documents with live editing and persistent 
         storage. Each document supports versioning, custom titles, user-based access controls, and 
@@ -32,7 +32,7 @@ function AboutUs() {
         compiler pane. For code execution, CCE integrates with the Judge0 API, allowing users to compile and 
         run C, Java, and Python code directly from the browser. <br></br> <br></br>
 
-        Whether you're a student, instructor, or developer, CCE has the potential to offer a reliable 
+        Whether you're a student, instructor, or developer, Context has the potential to offer a reliable 
         environment for coding and collaboration from any device.
       </p>
 

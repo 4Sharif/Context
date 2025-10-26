@@ -17,22 +17,15 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "CCE";
+    document.title = "Context";
   }, []);
-
-  // Function to handle Google sign-in
-  const handleGoogleLogin = async () => {
-
-    // Open Google popup and get user result
+ 
+  const handleGoogleLogin = async () => { 
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user; 
-
-      // Reference to user's firestore document
+      const user = result.user;  
       const userRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userRef);
-
-      // If user does not exist in firestore, create a new record
+      const docSnap = await getDoc(userRef); 
       if (!docSnap.exists()) {
         await setDoc(userRef, {
           uid: user.uid,
@@ -40,20 +33,18 @@ const LoginPage = () => {
           displayName: user.displayName,
           createdAt: serverTimestamp(),
         });
-      }
+      } 
 
-      // Redirect user to the dashboard after successful login
       navigate("/dashboard");
     } catch (error) {
       console.error("Login Error:", error);
     }
   };
-
-  // JSX layout for login page
+ 
   return (
     <div className="login-container">
       <div className="login-left">
-        <h2>Welcome to CCE!</h2>
+        <h2>Welcome to Context!</h2>
         <button className="google-btn" onClick={handleGoogleLogin}>
           Please login with Google
         </button>

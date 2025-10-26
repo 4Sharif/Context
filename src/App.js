@@ -184,8 +184,7 @@ function App() {
       setIsExecuting(false);
     }
   };
-
-  // Main layout: settings bar + editor + compiler pane
+ 
   return (
     <>
       <div className="settings-bar">
