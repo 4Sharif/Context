@@ -1,43 +1,39 @@
-# Context – Create, Compile, Collab
+# Context 
+### Create, Compile, Collab
 
-**Context** is a code editor application that lets users write, compile, and collaborate on code in real time. It supports versioning, user authentication, secure document sharing, and a live preview compiler for multiple languages.
+**Context** is a collaborative code editor that lets users write, compile, and collaborate on code in real time. Built with React and Firebase, it features a VS Code-like editor with syntax highlighting, a live compiler, and real-time collaboration capabilities.
 
 ---
 
 ## Features
 
-- Firebase Authentication  
-- Dashboard for document management
-- Invite collaborators via email
-- Version control with manual saves
-- Monaco Editor with syntax highlighting
-- Compiler integration using RapidAPI & Judge0
-- Real-time data sync with Firebase Firestore
-- EmailJS for collab invites 
+- **Authentication** - Secure login with Firebase Auth  
+- **Document Management** - Create, save, and manage multiple code files  
+- **Real-time Collaboration** - Multiple users can edit code together  
+- **Working Compiler** - Execute Python, Java, and C code remotely  
+- **Invite System** - Email invitations for collaboration  
+- **Monaco Editor** - VS Code-like editing experience with syntax highlighting  
 
 ---
 
 ## Tech Stack
 
-- **React** – Frontend framework
-- **Firebase** – Auth, Firestore, and Hosting
-- **EmailJS** – Send email invites from client
-- **Monaco Editor** – VSCode-like code editor
-- **RapidAPI + Judge0** – Backend compiler support
-- **React Router DOM** – Page navigation
-- **Axios** – API requests
-- **CSS** – Custom component styling
+- React  
+- Firebase (Authentication + Firestore)  
+- Monaco Editor  
+- RapidAPI + Judge0 (Code execution)  
+- EmailJS  
+- React Router DOM  
+- Axios  
 
 ---
 
-## Local Setup Instructions
-
-Follow these steps to run the project on your own machine.
+## Setup
 
 ### Prerequisites
 
-- Node.js (LTS recommended: v18.x or higher): https://nodejs.org/
-- npm (comes with Node.js)
+- Node.js (v18.x or higher): https://nodejs.org/
+- npm
 
 Verify installation:
 ```bash
@@ -47,87 +43,77 @@ npm -v
 
 ---
 
-### Step-by-Step Setup
+### Step 1: Clone the Repository
 
-#### 1. Create a New React App
 ```bash
-npx create-react-app context
-cd context
-```
-
-#### 2. Replace Files
-- Delete the default `src/` and `public/` folders
-- Copy the provided `src/` and `public/` into your project
-- Overwrite the existing `package.json` and `package-lock.json` with the ones provided
-- Create a new `.env` file and paste your API keys (see below)
-
-**Folder Structure After Setup:**
-```
-context/
-├── node_modules/
-├── public/             ← replaced
-├── src/                ← replaced
-├── package.json        ← replaced
-├── package-lock.json   ← replaced
-├── .env                ← your API keys go here
+git clone <your-repo-url>
+cd context-editor
 ```
 
 ---
 
-#### 3. Install Dependencies
+### Step 2: Install Dependencies
+
 ```bash
 npm install
 ```
 
-This installs:
-- React
-- Firebase
-- EmailJS
-- React Router DOM
-- Axios
-- Monaco Editor 
+---
+
+### Step 3: Configure API Keys
+
+**Important:** This project requires your own API keys from external services. The existing keys in the repository are placeholders only.
+
+#### Get Your API Keys:
+
+1. **Firebase** - https://firebase.google.com/
+   - Create a new project
+   - Enable Authentication (Google provider)
+   - Enable Firestore Database
+   - Get your config from Project Settings → General
+
+2. **RapidAPI + Judge0** - https://rapidapi.com/
+   - Subscribe to Judge0 API
+   - Get your RapidAPI key from your dashboard
+
+3. **EmailJS** - https://www.emailjs.com/
+   - Create a service
+   - Create email templates
+   - Get your keys from Account → API Keys
+
+#### Create `.env` File
+
+In the root directory, create a file named `.env` and add your keys:
+
+```
+REACT_APP_FIREBASE_API_KEY=your_firebase_key_here
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_bucket.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+
+REACT_APP_RAPID_API_KEY=your_rapidapi_key
+REACT_APP_EMAILJS_SERVICE_ID=your_emailjs_service_id
+REACT_APP_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+REACT_APP_EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+```
 
 ---
 
-#### 4. Create Your `.env` File
-
-Inside the root of your project (`context/`), create a file named `.env` and add:
-
-```
-REACT_APP_FIREBASE_API_KEY=yourKeyHere
-REACT_APP_FIREBASE_AUTH_DOMAIN=yourProject.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=yourProjectId
-REACT_APP_FIREBASE_STORAGE_BUCKET=yourBucket
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=yourSenderId
-REACT_APP_FIREBASE_APP_ID=yourAppId
-
-REACT_APP_RAPID_API_KEY=yourRapidAPIkey
-REACT_APP_EMAILJS_SERVICE_ID=yourServiceID
-REACT_APP_EMAILJS_TEMPLATE_ID=yourTemplateID
-REACT_APP_EMAILJS_PUBLIC_KEY=yourEmailJSPublicKey
-```
-
----
-
-#### 5. Run the App
+### Step 4: Run the App
 
 ```bash
 npm start
 ```
 
-It will open automatically in your browser at:
+Open http://localhost:3000
 
-```
-http://localhost:3000
-```
-
----  
+---
 
 ## Troubleshooting
 
-- Ensure you ran `npm install` before `npm start`
-- Make sure `.env` file exists and is correctly formatted
-- If Firebase login fails, enable 2-step verification (MFA) on your Google Account
-- For CORS or compiler issues, check if your RapidAPI plan has hit its quota
-
---- 
+- Make sure `.env` file exists in the root directory  
+- Verify all API keys are correctly formatted  
+- For Firebase login issues, enable 2-step verification on your Google Account  
+- Check RapidAPI quota if compiler isn't working   
