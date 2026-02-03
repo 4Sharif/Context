@@ -5,91 +5,58 @@ to create new documents or delete existing ones.
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  collection,
-  addDoc,
-  query, 
-  getDocs,
-  deleteDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { auth, db } from "./firebaseConfig";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useAuth } from "./hooks/useAuth";
+import { useDocuments } from "./hooks/useDocuments";
+import { documentService } from "./services/documentService";
+import LoadingSpinner from "./components/LoadingSpinner";
+import toast from "react-hot-toast";
 import "./index.css";
 
 function DocsDashboard() {
-  const [user, setUser] = useState(null); // Logged-in user object
-  const [docs, setDocs] = useState([]); // User's documents list
-  const [showSettings, setShowSettings] = useState(false); // Toggles side tab
+  const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
+  const { user, signOut: authSignOut } = useAuth();
+  const { documents, loading, error, refetch } = useDocuments(user?.uid);
 
-  // Handles user authentication and fetches docs when user logs in
   useEffect(() => {
     document.title = "Dashboard";
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        navigate("/"); // Redirect to login if not logged in
-      } else {
-        setUser(currentUser);
-        fetchDocs(currentUser.uid); // Load user's documents
-      }
-    });
-    return () => unsubscribe();
-  }, [navigate]);
+    if (!user && !loading) {
+      navigate("/");
+    }
+  }, [user, loading, navigate]);
 
-  // Fetches all documents for the given user from firestore
-  const fetchDocs = async (uid) => {
-    const q = query(collection(db, "documents"));
-    const querySnapshot = await getDocs(q);
-  
-    // Only include docs where the user is owner or collaborator
-    const docsData = querySnapshot.docs
-      .map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      }))
-      .filter((doc) => {
-        return doc.owner === uid || (doc.collaborators || []).includes(uid);
-      });
-  
-    // Sort by last edited time, newest first
-    docsData.sort((a, b) => {
-      const aTime = a.lastEdited?.toDate?.() ?? new Date(0);
-      const bTime = b.lastEdited?.toDate?.() ?? new Date(0);
-      return bTime - aTime;
-    });
-  
-    setDocs(docsData);
-  };  
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);  
 
-  // Creates a new empty document in firestore and navigates to the editor
   const handleNewDoc = async () => {
+    if (!user) return;
+    
     try {
-      const docRef = await addDoc(collection(db, "documents"), {
-        owner: user.uid,
-        collaborators: [],
-        code: "",
-        language: "plaintext",
-        title: "Untitled",
-        createdAt: serverTimestamp(),
-        lastEdited: serverTimestamp(),
-      });
-  
-      console.log(" New document created:", docRef.id); // Add this log
-      navigate(`/editor/${docRef.id}`);
+      const docId = await documentService.createDocument(user.uid);
+      toast.success("Document created");
+      navigate(`/editor/${docId}`);
     } catch (error) {
-      console.error("Error creating document:", error); // Catch errors creating doc
+      toast.error(error.message);
     }
   };
 
-  // Deletes a document by its ID and refreshes the list
   const handleDelete = async (id) => {
-    await deleteDoc(doc(db, "documents", id));
-    fetchDocs(user.uid); // Refresh list after deletion
+    if (!window.confirm("Are you sure you want to delete this document? This cannot be undone.")) {
+      return;
+    }
+    
+    try {
+      await documentService.deleteDocument(id);
+      toast.success("Document deleted");
+      refetch();
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  // Formats firestore timestamp to MM/DD/YYYY or returns "N/A"
   const formatDate = (timestamp) => {
     if (!timestamp?.toDate) return "N/A";
     const d = timestamp.toDate();
@@ -99,14 +66,21 @@ function DocsDashboard() {
     });
   };
 
-  // Toggles visibility of the settings sidebar
   const toggleSettings = () => setShowSettings(!showSettings);
 
-  // Signs user out and redirects to login page
   const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/");
+    try {
+      await authSignOut();
+      toast.success("Signed out successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
+  
+  if (loading) {
+    return <LoadingSpinner message="Loading your documents..." />;
+  }
  
   return (
     <div className="dashboard-container">
@@ -136,38 +110,44 @@ function DocsDashboard() {
 
         <div className="saved-documents">
           <h2>Saved Versions</h2>
-          <ul>
-          <div className="doc-scroll-container">
-            {docs.map((document) => (
-              <li key={document.id}>
-                <button
-                  className="doc-link"
-                  onClick={() => navigate(`/editor/${document.id}`)}
-                >
-                  <span>Title: "{document.title}"</span> ––{" "}
-                  <span>Last Edited: {formatDate(document.lastEdited)}</span> ––{" "} 
-                  <span>Date Created: {formatDate(document.createdAt)}</span>
-                </button>
-                {document.owner === user.uid ? (
-                <button
-                  className="delete-button"
-                  onClick={() => handleDelete(document.id)}
-                >
-                  Delete
-                </button>
-              ) : (
-                <button
-                  className="delete-button"
-                  disabled
-                  title="You are a collaborator"
-                >
-                  Collabing
-                </button>
-              )}
-              </li>
-            ))}
-            </div>
-          </ul>
+          {documents.length === 0 ? (
+            <p style={{ textAlign: "center", color: "#888", padding: "40px" }}>
+              No documents yet. Click the + button to create one!
+            </p>
+          ) : (
+            <ul>
+              <div className="doc-scroll-container">
+                {documents.map((document) => (
+                  <li key={document.id}>
+                    <button
+                      className="doc-link"
+                      onClick={() => navigate(`/editor/${document.id}`)}
+                    >
+                      <span>Title: "{document.title}"</span> ––{" "}
+                      <span>Last Edited: {formatDate(document.lastEdited)}</span> ––{" "} 
+                      <span>Date Created: {formatDate(document.createdAt)}</span>
+                    </button>
+                    {document.owner === user?.uid ? (
+                      <button
+                        className="delete-button"
+                        onClick={() => handleDelete(document.id)}
+                      >
+                        Delete
+                      </button>
+                    ) : (
+                      <button
+                        className="delete-button"
+                        disabled
+                        title="You are a collaborator"
+                      >
+                        Collabing
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </div>
+            </ul>
+          )}
         </div>
       </div>
     </div>

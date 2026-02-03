@@ -7,131 +7,109 @@ a collaboration invite via EmailJS.
 import React, { useState } from "react";
 import "./CollabModal.css";
 import { sendSharedCode, inviteUser } from "./sendEmail";
+import { documentService } from "./services/documentService";
+import { validateEmail } from "./utils/validation";
+import toast from "react-hot-toast";
 import {
   collection, 
   query,
   where,
   getDocs,
-  doc,
-  updateDoc,
-  arrayUnion,
-  getDoc,
 } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
 const CollabModal = ({ user, code, language, onClose, docId }) => {
-  const [mode, setMode] = useState("Share"); // "Share" (send code) or "Invite" (collab link)
-  const [email, setEmail] = useState(""); // Email input state
+  const [mode, setMode] = useState("Share");
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Handles send action for either mode
   const handleSend = async () => {
-    if (!email) {
-      alert("Please enter a valid email.");
+    if (!email || !validateEmail(email)) {
+      toast.error("Please enter a valid email address");
       return;
     }
 
-    // Share mode: sends code snippet via email
-    if (mode === "Share") {
-      const result = await sendSharedCode({
-        fromEmail: user.email,
-        toEmail: email,
-        codeContent: code,
-        language,
-      });
+    if (email.toLowerCase() === user.email.toLowerCase()) {
+      toast.error("You cannot invite yourself");
+      return;
+    }
 
-      if (result.success) {
-        alert("Code sent successfully!");
-        onClose();
-      } else {
-        alert("Failed to send code. Please try again.");
-        console.error(result.error);
-      }
-    } 
-    
-    // Invite mode: adds invited user uid to collaborators and emails link
-    else if (mode === "Invite") {
-      try {
+    setIsLoading(true);
+
+    try {
+      if (mode === "Share") {
+        const result = await sendSharedCode({
+          fromEmail: user.email,
+          toEmail: email,
+          codeContent: code,
+          language,
+        });
+
+        if (result.success) {
+          toast.success("Code sent successfully!");
+          onClose();
+        } else {
+          toast.error("Failed to send code. Please try again.");
+        }
+      } else if (mode === "Invite") {
         if (!user || !user.email || !docId) {
-          alert("Missing user or document info.");
+          toast.error("Missing user or document info");
           return;
         }
 
-        // Look up the uid of the invited email in firebase auth users collection
         const usersRef = collection(db, "users");
         const q = query(usersRef, where("email", "==", email));
         const querySnapshot = await getDocs(q);
 
-        console.log("querySnapshot empty:", querySnapshot.empty);
-        if (!querySnapshot.empty) {
-          console.log("Found user:", querySnapshot.docs[0].data());
-        }
-
         if (querySnapshot.empty) {
-          alert("Sorry! That email does not have an account with us :(");
+          toast.error("That email does not have an account with us");
           return;
         }
 
         const invitedUserDoc = querySnapshot.docs[0];
         const invitedUID = invitedUserDoc.id;
 
-        // Add the invited user's uid to this doc's collaborators field
-        const docRef = doc(db, "documents", docId);
-        const docSnap = await getDoc(docRef);
-        
-        if (!docSnap.exists()) {
-          alert("Document does not exist.");
-          return;
-        }
-        
-        const data = docSnap.data();
-        
-        // Ensure only the owner can update collaborators
-        if (data.owner !== user.uid) {
-          alert("Only the owner can invite collaborators.");
-          return;
-        }
-        
-        await updateDoc(docRef, {
-          collaborators: arrayUnion(invitedUID),
-        });
-        console.log("Collaborator added:", invitedUID);
+        await documentService.addCollaborator(docId, invitedUID);
 
-        console.log("Added collaborator UID:", invitedUID); 
-
-        // Email the invite link
         const collabLink = `${window.location.origin}/editor/${docId}`;
         const inviteResult = await inviteUser(email, user.email, collabLink);
 
         if (inviteResult.success) {
-          alert("Invite sent successfully!");
+          toast.success("Invite sent successfully!");
           onClose();
         } else {
-          console.error("Email send failed:", inviteResult.error);
-          alert("Failed to send email invite. Please try again.");
+          toast.error("Failed to send email invite");
         }
-
-      } catch (error) {
-        console.error("Invite error:", error);
-        alert("Failed to send invite. Please try again.");
       }
+    } catch (error) {
+      toast.error(error.message || "Failed to send invite");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Modal layout (mode toggle, input, send/cancel)
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <h2>Collaborate</h2>
+    <div 
+      className="modal-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="collab-modal-title"
+    >
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h2 id="collab-modal-title">Collaborate</h2>
         <div className="mode-buttons">
           <button
             className={mode === "Share" ? "active" : ""}
             onClick={() => setMode("Share")}
+            aria-label="Share code mode"
           >
             Share
           </button>
           <button
             className={mode === "Invite" ? "active" : ""}
             onClick={() => setMode("Invite")}
+            aria-label="Invite collaborator mode"
           >
             Invite
           </button>
@@ -141,12 +119,17 @@ const CollabModal = ({ user, code, language, onClose, docId }) => {
           placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
+          aria-label="Email address"
         />
         <div className="action-buttons">
-          <button onClick={handleSend}>
-            {mode === "Share" ? "Send Code" : "Send Invite"}
+          <button 
+            onClick={handleSend}
+            disabled={isLoading}
+          >
+            {isLoading ? "Sending..." : mode === "Share" ? "Send Code" : "Send Invite"}
           </button>
-          <button onClick={onClose}>Cancel</button>
+          <button onClick={onClose} disabled={isLoading}>Cancel</button>
         </div>
       </div>
     </div>

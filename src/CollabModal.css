@@ -74,4 +74,41 @@
   background-color: #444;
   color: white;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-buttons button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.action-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-buttons button:focus,
+.mode-buttons button:focus,
+.modal input:focus {
+  outline: 2px solid #888;
+  outline-offset: 2px;
+}
+
+/* Responsive modal */
+@media (max-width: 480px) {
+  .modal {
+    width: 90%;
+    padding: 16px;
+  }
+  
+  .modal h2 {
+    font-size: 18px;
+  }
+  
+  .mode-buttons {
+    flex-direction: column;
+  }
+  
+  .mode-buttons button {
+    margin: 5px 0;
+  }
 }

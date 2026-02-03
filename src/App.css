@@ -14,8 +14,7 @@
 .editor-container {
   display: flex;
   height: calc(100vh - 50px); /* subtract height of settings bar */
-  width: 100%;
-  margin: 7.5px 0px; 
+  width: 100%; 
 }
 
 /* Editor fills remaining space */
@@ -69,6 +68,16 @@
 
 .standard-button:hover {
   background-color: #444;
+}
+
+.standard-button:focus {
+  outline: 2px solid #888;
+  outline-offset: 2px;
+}
+
+.standard-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .output-pre {
@@ -147,4 +156,96 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Auto-save indicator */
+.save-indicator {
+  color: #888;
+  font-size: 12px;
+  margin-left: auto;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+/* Title input */
+.title-input {
+  flex: 1;
+  max-width: 300px;
+  min-width: 150px;
+}
+
+/* Run button highlight */
+.run-button:not(:disabled) {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.run-button:not(:disabled):hover {
+  background-color: #45a049;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .settings-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+  
+  .editor-container {
+    flex-direction: column;
+    height: calc(100vh - 100px);
+  }
+  
+  .compiler-pane {
+    width: 100%;
+    height: 250px;
+    border-left: none;
+    border-top: 1px solid #444;
+  }
+  
+  .standard-button {
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 14px;
+  }
+  
+  .title-input {
+    order: -1;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .save-indicator {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+  }
+  
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .login-left, .login-right {
+    flex: none;
+    width: 100%;
+    height: 50vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-bar {
+    padding: 8px;
+  }
+  
+  .standard-button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .compiler-pane {
+    height: 200px;
+  }
 }
