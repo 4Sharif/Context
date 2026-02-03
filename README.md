@@ -1,5 +1,13 @@
 # Context 
+---
+
 ### Create, Compile, Collab
+
+![Login](public/images/login.png)
+
+![Dashboard](public/images/dashboard.png)
+
+![Editor](public/images/editor.png)
 
 **Context** is an online code editor that lets users write, compile, and collaborate on code in real time. Built with React and Firebase, it features a VS Code-like editor with syntax highlighting, auto-save functionality, and real-time collaboration capabilities.
 
