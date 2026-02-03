@@ -59,8 +59,7 @@ npm -v
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/context-editor.git
-cd context-editor
+git clone https://github.com/4Sharif/Context
 ```
 
 ---
