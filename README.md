@@ -1,164 +1,141 @@
-# Context 
----
+# Context
 
-### Create, Compile, Collab
-
-![Login](public/images/login.png)
-
-![Dashboard](public/images/dashboard.png)
-
-![Editor](public/images/editor.png)
-
-**Context** is an online code editor that lets users write, compile, and collaborate on code in real time. Built with React and Firebase, it features a VS Code-like editor with syntax highlighting, auto-save functionality, and real-time collaboration capabilities.
-
----
+Context is a real-time collaborative online code editor that allows users to write, execute, and collaborate on code inside a browser. It provides a VS Code-grade Monaco editing environment paired with cloud auto-save, remote multi-language compilation, and granular document sharing.
 
 ## Features
 
-- **Authentication** - Secure Google sign-in with Firebase Auth
-- **Auto-Save** - Changes automatically saved every 2 seconds with visual indicator
-- **Document Management** - Create, save, and manage multiple code files
-- **Real-time Sync** - Efficient Firestore queries with real-time updates
-- **Code Execution** - Run Python and C code remotely via Judge0 API
-- **Collaboration** - Invite collaborators via email with role-based permissions
-- **Monaco Editor** - VS Code-like editing experience with syntax highlighting
-- **Responsive Design** - Works on desktop, tablet, and mobile devices
-- **Accessibility** - ARIA labels, keyboard navigation, and focus indicators
+- **Monaco Code Editor**: Full-featured VS Code editing experience with syntax highlighting, line numbers, and multi-cursor support.
+- **Remote Code Execution**: Compiles and runs Python and C code remotely via Judge0 API integration with live output streaming.
+- **Throttled Cloud Auto-Save**: Real-time document persistence to Firestore every 2 seconds with visual sync indicators.
+- **Document Management**: Create, view, rename, and manage multiple isolated code documents from a centralized dashboard.
+- **Role-Based Collaboration**: Share documents with team members via email invites with view/edit permission controls.
+- **Authentication**: Secure Google OAuth authentication managed through Firebase Auth.
 
----
+## Architecture
+
+### Engineering Highlights
+
+- **Throttled Persistence**: Employs a custom `useAutoSave` hook that throttles document writes to Firestore at 2-second intervals, minimizing database write operations while guaranteeing low latency feedback for the user.
+- **Indexed Real-Time Queries**: Leverages Firestore indexed `where()` clauses and snapshot listeners to stream updates only for documents the authenticated user owns or collaborates on.
+- **Role-Based Security Model**: Enforces document ownership and collaborator permissions across both client-side route guards and server-side Firestore security rules.
+- **Route-Based Code Splitting**: Utilizes dynamic React imports and lazy loading for heavy modules (like the Monaco Editor bundle), cutting initial page payload by ~70%.
+
+### Project Structure
+
+```text
+context-editor/
+├── public/                     # Static assets and index HTML
+├── src/
+│   ├── components/             # Reusable UI components
+│   │   ├── ErrorBoundary.js    # Application crash protection
+│   │   └── LoadingSpinner.js   # Async state indicators
+│   ├── hooks/                  # Custom business logic and state hooks
+│   │   ├── useAuth.js          # Authentication state management
+│   │   ├── useAutoSave.js      # Throttled auto-save logic
+│   │   ├── useDocument.js      # Single-document real-time Firestore sync
+│   │   └── useDocuments.js     # User document collection queries
+│   ├── services/               # Data access and API integration layer
+│   │   ├── authService.js      # Firebase Auth methods
+│   │   ├── codeExecutionService.js # Judge0 execution API client
+│   │   └── documentService.js  # Firestore CRUD operations & security rules
+│   ├── utils/                  # Utility helpers, constants, and logging
+│   ├── App.js                  # Route configuration and core layout
+│   ├── DocsDashboard.js        # Main document dashboard
+│   ├── LoginPage.js            # OAuth authentication landing view
+│   ├── CollabModal.js          # Share and collaborator invite modal
+│   └── firebaseConfig.js       # Firebase client SDK initialization
+├── package.json                # Project dependencies and scripts
+└── .env                        # Environment configuration
+```
 
 ## Tech Stack
 
-### Frontend
-- React 19.0.0
-- Monaco Editor (VS Code editor)
-- React Router DOM (client-side routing)
-- React Hot Toast (notifications)
+- **Frontend**: React 19, Monaco Editor (`@monaco-editor/react`), React Router DOM, React Hot Toast
+- **Backend & Database**: Firebase Authentication (Google OAuth), Cloud Firestore
+- **Code Execution**: Judge0 API via RapidAPI
+- **Communications**: EmailJS (collaboration invite notifications)
 
-### Backend
-- Firebase Authentication (Google OAuth)
-- Cloud Firestore (real-time database)
-- Judge0 API via RapidAPI (code execution)
-- EmailJS (collaboration invites)
+## Usage & Workflows
 
-### Architecture
-- Services layer for data access
-- Custom React hooks for state management
-- Code splitting with lazy loading
-- Error boundaries for crash recovery  
+1. **Authentication**: Sign in with a Google account to establish workspace identity.
+2. **Document Creation**: Initialize a new document from the dashboard and select the target programming language (Python or C).
+3. **Editing & Auto-Save**: Code in the Monaco editor; edits are automatically throttled and persisted to Cloud Firestore.
+4. **Code Execution**: Click **Run** to submit the code buffer to Judge0 and view stdout/stderr output in the integrated console.
+5. **Collaboration**: Click **Collab** to invite contributors by email and assign access permissions.
+6. **Export**: Export code files locally as standalone source files.
 
----
+## Limitations & Trade-offs
 
-## Setup
+- **Concurrency Model**: Uses a last-write-wins approach without operational transformation (OT) or CRDT-based character merging.
+- **Language Support**: Currently configured for Python and C execution pipelines; additional languages require Judge0 runtime profile mappings.
+- **Collaboration Accounts**: Email invites require recipients to sign in with an active Google account to resolve permissions.
+
+## User Interface
+
+**Login Page:** Simple and secure Google authentication to access your workspace.
+
+![Login](public/images/login.png)
+
+**Dashboard:** Manage your saved code documents, create new ones, or delete old ones.
+
+![Dashboard](public/images/dashboard.png)
+
+**Editor:** A full-featured Monaco editor with syntax highlighting, live execution, and collaboration tools.
+
+![Editor](public/images/editor.png)
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18.x or higher): https://nodejs.org/
-- npm
+- [Node.js](https://nodejs.org/) (v18.x or higher)
+- npm (bundled with Node.js)
 
-Verify installation:
 ```bash
 node -v
 npm -v
 ```
 
----
+### Installation
 
-### Step 1: Clone the Repository
+1. Clone the repository:
 
 ```bash
-git clone https://github.com/4Sharif/Context
+git clone https://github.com/4Sharif/Context.git
+cd Context/context-editor
 ```
 
----
-
-### Step 2: Install Dependencies
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
----
+3. Configure environment variables in `.env`:
 
-### Step 3: Set Up Firebase Security Rules
+```env
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+REACT_APP_RAPIDAPI_KEY=your_judge0_rapidapi_key
+REACT_APP_EMAILJS_SERVICE_ID=your_emailjs_service_id
+REACT_APP_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+REACT_APP_EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+```
 
-Deploy the Firestore security rules to ensure proper data access control:
+4. Deploy Firestore security rules:
+   - Copy the security rule block documented in `src/services/documentService.js`.
+   - Publish the rules in the Firebase Console under **Firestore Database → Rules**.
 
-1. Go to Firebase Console → Firestore Database → Rules
-2. Copy the rules from the comments in `src/services/documentService.js`
-3. Publish the rules
+### Running
 
----
-
-### Step 4: Run the App
+Start the local development server:
 
 ```bash
 npm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## Architecture
-
-### Project Structure
-
-```
-src/
-├── components/         # Reusable UI components
-│   ├── ErrorBoundary.js
-│   └── LoadingSpinner.js
-├── hooks/              # Custom React hooks
-│   ├── useAuth.js      # Authentication state
-│   ├── useAutoSave.js  # Auto-save with throttling
-│   ├── useDocument.js  # Real-time document sync
-│   └── useDocuments.js # User's documents list
-├── services/           # Data access layer
-│   ├── authService.js
-│   ├── documentService.js
-│   └── codeExecutionService.js
-├── utils/              # Helper functions
-│   ├── constants.js
-│   ├── logger.js
-│   └── validation.js
-└── [pages/components]  # Main UI components
-```
-
-### Key Features
-
-**Auto-Save**: Changes are automatically saved to Firestore every 2 seconds using throttled updates with visual feedback.
-
-**Efficient Queries**: Uses Firestore `where()` clauses to fetch only relevant documents instead of client-side filtering.
-
-**Permission System**: Owner and collaborator roles with Firestore security rules enforcement.
-
-**Code Splitting**: Routes are lazy-loaded to reduce initial bundle size by ~70%.
-
-**Error Handling**: Comprehensive try-catch blocks with user-friendly toast notifications.
-
----
-
-## Usage
-
-1. **Sign in** with your Google account
-2. **Create a new document** using the + button on the dashboard
-3. **Write code** in the Monaco editor (Python or C supported)
-4. **Changes auto-save** every 2 seconds (watch the indicator in the top-right)
-5. **Run code** using the Run button to see output
-6. **Invite collaborators** via the Collab button (owner only)
-7. **Download** your code as a file
-
----
-
-## Known Limitations
-
-- Java code execution may be unreliable due to Judge0 API limitations
-- Auto-save uses last-write-wins (no conflict resolution)
-- Email invites require recipient to have an existing account
-
----
-
-## Contributing
-
-This is a portfolio/learning project. Feel free to fork and modify for your own use.
